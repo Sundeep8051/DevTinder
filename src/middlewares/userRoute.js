@@ -1,12 +1,41 @@
 const User = require("../models/user");
+const validateUser = require("../helpers/validate-user");
+const bcrypt = require("bcrypt");
 
 const userRoute = (app) => {
   app.post("/signup", async (req, res) => {
     try {
-      const user = new User(req.body);
+      validateUser(req);
+
+      const { firstName, lastName, emailId, password, age, gender } = req.body;
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const user = new User({
+        firstName,
+        lastName,
+        emailId,
+        password: hashedPassword,
+        age,
+        gender,
+      });
 
       await user.save();
       res.send("User created successfully");
+    } catch (err) {
+      res.status(400).send(`Error: ${err}`);
+    }
+  });
+
+  app.post("/login", async (req, res) => {
+    try {
+      const { emailId, password } = req.body;
+      const user = await User.findOne({ emailId });
+      if (!user) res.status(404).send("User not found");
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) return res.status(400).send("Invalid credentials");
+      res.send("Login successful");
     } catch (err) {
       res.status(400).send(`Error: ${err}`);
     }
@@ -44,6 +73,7 @@ const userRoute = (app) => {
       const data = req.body;
       const user = await User.findByIdAndUpdate(userId, data, {
         returnDocument: "after",
+        runValidators: true,
       });
       if (!user) {
         res.status(404).send("User details not found");
