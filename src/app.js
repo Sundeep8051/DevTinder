@@ -1,13 +1,17 @@
 const express = require("express");
 const appRoutes = require("./middlewares/routes");
 const connectDB = require("./config/database");
+const authRoute = require("./middlewares/auth");
+const userRoute = require("./middlewares/userRoute");
 
 const app = express();
 
+app.use(express.json());
+
 const port = 80;
 
-const users = [];
-
+authRoute(app);
+userRoute(app);
 appRoutes(app);
 
 connectDB()
