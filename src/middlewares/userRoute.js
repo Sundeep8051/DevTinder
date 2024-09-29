@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const validateUser = require("../helpers/validate-user");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+
 const authRoute = require("./authRoute");
 
 const userRoute = (app) => {
@@ -35,10 +35,10 @@ const userRoute = (app) => {
       const user = await User.findOne({ emailId });
       if (!user) res.status(404).send("User not found");
 
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await user.validatePassword(password);
       if (!isMatch) return res.status(400).send("Invalid credentials");
 
-      let token = await User.getJwt();
+      let token = await user.getJwt();
 
       res.cookie("token", token, { expires: new Date(Date.now() + 1000000) });
       res.send("Login successful");
