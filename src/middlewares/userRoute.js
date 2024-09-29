@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const validateUser = require("../helpers/validate-user");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const authRoute = require("./authRoute");
 
 const userRoute = (app) => {
   app.post("/signup", async (req, res) => {
@@ -35,7 +37,21 @@ const userRoute = (app) => {
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).send("Invalid credentials");
+
+      let token = await User.getJwt();
+
+      res.cookie("token", token, { expires: new Date(Date.now() + 1000000) });
       res.send("Login successful");
+    } catch (err) {
+      res.status(400).send(`Error: ${err}`);
+    }
+  });
+
+  app.get("/profile", authRoute, async (req, res) => {
+    try {
+      const user = req.user;
+      if (!user) res.status(404).send("User not found");
+      res.status(200).send(user);
     } catch (err) {
       res.status(400).send(`Error: ${err}`);
     }

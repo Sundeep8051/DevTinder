@@ -1,16 +1,19 @@
 const express = require("express");
-const appRoutes = require("./middlewares/routes");
+const cookieParser = require("cookie-parser");
+
+const appRoutes = require("./middlewares/appRoutes");
 const connectDB = require("./config/database");
-const authRoute = require("./middlewares/auth");
+const authRoute = require("./middlewares/authRoute");
 const userRoute = require("./middlewares/userRoute");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 const port = 80;
 
-authRoute(app);
+//authRoute(app);
 userRoute(app);
 appRoutes(app);
 
