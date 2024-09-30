@@ -1,10 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 
-const appRoutes = require("./middlewares/appRoutes");
 const connectDB = require("./config/database");
-const authRoute = require("./middlewares/authRoute");
-const userRoute = require("./middlewares/userRoute");
 
 const app = express();
 
@@ -13,9 +10,12 @@ app.use(cookieParser());
 
 const port = 80;
 
-//authRoute(app);
-userRoute(app);
-appRoutes(app);
+const authRouter = require("./routes/auth");
+const userRouter = require("./routes/user");
+const profileRouter = require("./routes/profile");
+const exceptionRouter = require("./routes/exception");
+
+app.use("/", authRouter, userRouter, profileRouter, exceptionRouter);
 
 connectDB()
   .then(() => {
