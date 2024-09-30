@@ -6,13 +6,16 @@ const auth = async (req, res, next) => {
   try {
     const cookies = req.cookies;
     const { token } = cookies;
-    if (!token) res.status(404).send("Invalid token");
+    if (!token) {
+      res.status(404).send("Invalid token");
+    } else {
+      const id = jwt.verify(token, "Sundeep");
+      const user = await User.findById(id);
+      if (!user) res.status(404).send("User not found");
+      else req.user = user;
 
-    const id = jwt.verify(token, "Sundeep");
-    const user = await User.findById(id);
-    if (!user) res.status(404).send("User not found");
-    else req.user = user;
-    next();
+      next();
+    }
   } catch (err) {
     res.status(400).send(`Error: ${err}`);
   }

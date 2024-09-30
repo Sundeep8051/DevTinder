@@ -1,6 +1,6 @@
 const validator = require("validator");
 
-const ValidateUser = (req) => {
+const ValidateSignUpUser = (req) => {
   const { firstName, lastName, emailId, password, age, gender } = req.body;
 
   if (!firstName || !lastName) {
@@ -30,4 +30,14 @@ const ValidateUser = (req) => {
   }
 };
 
-module.exports = ValidateUser;
+const ValidateEditUserModel = (req) => {
+  const isAllowedValues = ["firstName", "lastName", "age", "about", "skills"];
+
+  if (
+    !Object.keys(req.body).every((field) => isAllowedValues.includes(field))
+  ) {
+    throw new Error("Invalid field in request body/Field not allowed to edit");
+  }
+};
+
+module.exports = { ValidateSignUpUser, ValidateEditUserModel };
