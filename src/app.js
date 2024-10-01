@@ -13,9 +13,10 @@ const port = 80;
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const profileRouter = require("./routes/profile");
-const exceptionRouter = require("./routes/exception");
+const error = require("./middleware/error");
 
-app.use("/", authRouter, userRouter, profileRouter, exceptionRouter);
+app.use("/", authRouter, userRouter, profileRouter);
+app.use(error);
 
 connectDB()
   .then(() => {
